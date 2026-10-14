@@ -1,12 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mantenimientos</title>
+    <meta name="theme-color" content="#f3f5f2">
+    <title>Mantenimientos | Opticom</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+    <script src="app.js" defer></script>
 </head>
 <body>
-    <h1>Mantenimientos</h1>
+    <header class="topbar">
+        <a class="brand" href="#inicio" aria-label="Opticom, inicio">
+            <span class="brand-mark" aria-hidden="true">O</span>
+            <span class="brand-name">opticom<span>.</span></span>
+        </a>
+        <div class="topbar-label"><span class="status-light"></span> OPERACIONES <span class="topbar-divider">/</span> MANTENIMIENTOS</div>
+        <span class="topbar-date" id="today-label"></span>
+    </header>
 
+    <main class="page" id="inicio">
+        <section class="page-heading" aria-labelledby="page-title">
+            <div>
+                <p class="eyebrow">SERVICIO TÉCNICO</p>
+                <h1 id="page-title">Mantenimientos</h1>
+                <p class="heading-copy">Organiza las visitas y lleva el seguimiento de cada cliente.</p>
+            </div>
+            <button class="button button-export" id="export-button" type="button">
+                <span aria-hidden="true">↓</span> Descargar Excel
+            </button>
+        </section>
+
+        <section class="summary" aria-label="Resumen de mantenimientos">
+            <article class="summary-item summary-total">
+                <span class="summary-label">Total registrados</span>
+                <strong class="summary-value" id="total-count">0</strong>
+                <span class="summary-note">mantenimientos</span>
+            </article>
+            <article class="summary-item summary-pending">
+                <span class="summary-label"><span class="summary-dot pending-dot"></span> Pendientes</span>
+                <strong class="summary-value" id="pending-count">0</strong>
+                <span class="summary-note">por atender</span>
+            </article>
+            <article class="summary-item summary-complete">
+                <span class="summary-label"><span class="summary-dot complete-dot"></span> Completos</span>
+                <strong class="summary-value" id="complete-count">0</strong>
+                <span class="summary-note">atendidos</span>
+            </article>
+        </section>
+
+        <section class="workspace" aria-label="Gestión de mantenimientos">
+            <aside class="form-panel" aria-labelledby="form-title">
+                <div class="panel-heading">
+                    <span class="panel-index">01</span>
+                    <div>
+                        <h2 id="form-title">Nuevo registro</h2>
+                        <p>Completa los datos del cliente</p>
+                    </div>
+                </div>
+                <form id="maintenance-form">
+                    <label for="name">Nombre del cliente</label>
+                    <input id="name" name="name" type="text" placeholder="Ej. María García" autocomplete="name" maxlength="100" required>
+
+                    <label for="address">Dirección</label>
+                    <input id="address" name="address" type="text" placeholder="Calle, número, colonia" autocomplete="street-address" maxlength="180" required>
+
+                    <label for="phone">Celular</label>
+                    <input id="phone" name="phone" type="tel" placeholder="Ej. 55 1234 5678" autocomplete="tel" maxlength="25" required>
+
+                    <label for="status">Estado del servicio</label>
+                    <select id="status" name="status">
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Completo">Completo</option>
+                    </select>
+
+                    <div class="form-actions">
+                        <button class="button button-primary" id="submit-button" type="submit">Guardar registro</button>
+                        <button class="button button-cancel" id="cancel-button" type="button" hidden>Cancelar</button>
+                    </div>
+                </form>
+                <p class="storage-note"><span aria-hidden="true">●</span> Guardado en este navegador</p>
+            </aside>
+
+            <section class="records-panel" aria-labelledby="records-title">
+                <div class="records-heading">
+                    <div class="records-title-wrap">
+                        <span class="panel-index">02</span>
+                        <div>
+                            <h2 id="records-title">Registro de clientes</h2>
+                            <p id="records-description">Consulta y actualiza los servicios</p>
+                        </div>
+                    </div>
+                    <span class="record-count" id="visible-count">0 registros</span>
+                </div>
+
+                <div class="toolbar">
+                    <label class="search-box" for="search-input">
+                        <span aria-hidden="true">⌕</span>
+                        <input id="search-input" type="search" placeholder="Buscar nombre, dirección o celular" autocomplete="off">
+                    </label>
+                    <label class="filter-wrap" for="status-filter">
+                        <span class="sr-only">Filtrar por estado</span>
+                        <select id="status-filter">
+                            <option value="Todos">Todos los estados</option>
+                            <option value="Pendiente">Pendientes</option>
+                            <option value="Completo">Completos</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Cliente</th>
+                                <th scope="col">Dirección</th>
+                                <th scope="col">Celular</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col"><span class="sr-only">Acciones</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="records-body"></tbody>
+                    </table>
+                    <div class="empty-state" id="empty-state">
+                        <span class="empty-mark" aria-hidden="true">＋</span>
+                        <strong id="empty-title">Aún no hay mantenimientos</strong>
+                        <p>Agrega el primer registro para empezar.</p>
+                    </div>
+                </div>
+                <p class="table-footnote" id="table-footnote">Los cambios se guardan automáticamente en este navegador.</p>
+            </section>
+        </section>
+        <p class="announcement" id="announcement" role="status" aria-live="polite"></p>
+    </main>
 </body>
 </html>
