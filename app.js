@@ -12,7 +12,9 @@ let editingId = null;
 function loadRecords() {
     try {
         const savedRecords = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-        return Array.isArray(savedRecords) ? savedRecords : [];
+        return Array.isArray(savedRecords)
+            ? savedRecords.map((record) => ({ type: "Mantenimiento", ...record }))
+            : [];
     } catch {
         return [];
     }
@@ -43,7 +45,7 @@ function renderRecords() {
     const query = searchInput.value.trim().toLocaleLowerCase("es");
     const selectedStatus = statusFilter.value;
     const filteredRecords = records.filter((record) => {
-        const matchesQuery = [record.name, record.address, record.phone]
+        const matchesQuery = [record.name, record.address, record.type, record.phone]
             .some((value) => value.toLocaleLowerCase("es").includes(query));
         return matchesQuery && (selectedStatus === "Todos" || record.status === selectedStatus);
     });
@@ -55,6 +57,8 @@ function renderRecords() {
         nameCell.setAttribute("data-label", "Cliente");
         const addressCell = makeCell(record.address);
         addressCell.setAttribute("data-label", "Dirección");
+        const typeCell = makeCell(record.type || "Mantenimiento");
+        typeCell.setAttribute("data-label", "Tipo de mantenimiento");
         const phoneCell = makeCell(record.phone, "phone-cell");
         phoneCell.setAttribute("data-label", "Celular");
 
@@ -78,7 +82,7 @@ function renderRecords() {
             actionsCell.append(button);
         }
 
-        row.append(nameCell, addressCell, phoneCell, statusCell, actionsCell);
+        row.append(nameCell, addressCell, typeCell, phoneCell, statusCell, actionsCell);
         recordsBody.append(row);
     }
 
@@ -110,6 +114,7 @@ form.addEventListener("submit", (event) => {
     const values = {
         name: formData.get("name").trim(),
         address: formData.get("address").trim(),
+        type: formData.get("type"),
         phone: formData.get("phone").trim(),
         status: formData.get("status")
     };
@@ -138,6 +143,7 @@ recordsBody.addEventListener("click", (event) => {
         editingId = record.id;
         form.elements.name.value = record.name;
         form.elements.address.value = record.address;
+        form.elements.type.value = record.type || "Mantenimiento";
         form.elements.phone.value = record.phone;
         form.elements.status.value = record.status;
         document.querySelector("#form-title").textContent = "Editar registro";
@@ -160,8 +166,8 @@ searchInput.addEventListener("input", renderRecords);
 statusFilter.addEventListener("change", renderRecords);
 
 function exportCsv() {
-    const headers = ["Nombre", "Dirección", "Celular", "Estado"];
-    const rows = records.map((record) => [record.name, record.address, record.phone, record.status]);
+    const headers = ["Nombre", "Dirección", "Tipo de mantenimiento", "Celular", "Estado"];
+    const rows = records.map((record) => [record.name, record.address, record.type || "Mantenimiento", record.phone, record.status]);
     const csv = [headers, ...rows].map((row) => row.map((value) => {
         const safeValue = /^[=+\-@]/.test(value) ? `'${value}` : value;
         return `"${safeValue.replaceAll('"', '""')}"`;
@@ -187,10 +193,10 @@ document.querySelector("#export-button").addEventListener("click", () => {
     }
 
     const sheet = XLSX.utils.aoa_to_sheet([
-        ["Nombre", "Dirección", "Celular", "Estado"],
-        ...records.map(({ name, address, phone, status }) => [name, address, phone, status])
+        ["Nombre", "Dirección", "Tipo de mantenimiento", "Celular", "Estado"],
+        ...records.map(({ name, address, type, phone, status }) => [name, address, type || "Mantenimiento", phone, status])
     ]);
-    sheet["!cols"] = [{ wch: 28 }, { wch: 42 }, { wch: 20 }, { wch: 16 }];
+    sheet["!cols"] = [{ wch: 28 }, { wch: 42 }, { wch: 25 }, { wch: 20 }, { wch: 16 }];
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, sheet, "Mantenimientos");
     XLSX.writeFile(workbook, `mantenimientos-${new Date().toISOString().slice(0, 10)}.xlsx`);

@@ -68,6 +68,13 @@
                     <label for="address">Dirección</label>
                     <input id="address" name="address" type="text" placeholder="Calle, número, colonia" autocomplete="street-address" maxlength="180" required>
 
+                    <label for="type">Tipo de mantenimiento</label>
+                    <select id="type" name="type" required>
+                        <option value="Corte de fibra">Corte de fibra</option>
+                        <option value="Cambio de equipo">Cambio de equipo</option>
+                        <option value="Mantenimiento" selected>Mantenimiento</option>
+                    </select>
+
                     <label for="phone">Celular</label>
                     <input id="phone" name="phone" type="tel" placeholder="Ej. 55 1234 5678" autocomplete="tel" maxlength="25" required>
 
@@ -118,6 +125,7 @@
                             <tr>
                                 <th scope="col">Cliente</th>
                                 <th scope="col">Dirección</th>
+                                <th scope="col">Tipo de mantenimiento</th>
                                 <th scope="col">Celular</th>
                                 <th scope="col">Estado</th>
                                 <th scope="col"><span class="sr-only">Acciones</span></th>

@@ -128,7 +128,7 @@ h2 { margin-bottom: 4px; font: 700 16px/1.3 "Manrope", sans-serif; letter-spacin
 .filter-wrap { flex: 0 0 150px; }
 .filter-wrap select { height: 38px; margin: 0; padding-right: 7px; font-size: 11px; }
 .table-scroll { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; text-align: left; }
+table { width: 100%; min-width: 740px; border-collapse: collapse; text-align: left; }
 thead { background: #f6f8f5; }
 th { height: 36px; color: #7c867d; font-size: 9px; font-weight: 700; letter-spacing: .35px; text-transform: uppercase; }
 th, td { padding: 0 10px; }
@@ -181,7 +181,7 @@ td.client-name { color: #29342c; font-size: 12px; font-weight: 700; }
 	.toolbar { gap: 7px; }
 	.filter-wrap { flex-basis: 132px; }
 	.search-box input { font-size: 10px; }
-	table { min-width: 670px; }
+	table { min-width: 740px; }
 }
 
 @media (max-width: 420px) {
