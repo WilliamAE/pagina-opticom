@@ -175,7 +175,7 @@ function exportCsv() {
     const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `mantenimientos-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `mantenimientos-actualizado-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
     announce("Archivo CSV descargado. Puedes abrirlo con Excel.");
@@ -199,7 +199,7 @@ document.querySelector("#export-button").addEventListener("click", () => {
     sheet["!cols"] = [{ wch: 28 }, { wch: 42 }, { wch: 25 }, { wch: 20 }, { wch: 16 }];
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, sheet, "Mantenimientos");
-    XLSX.writeFile(workbook, `mantenimientos-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.writeFile(workbook, `mantenimientos-actualizado-${new Date().toISOString().slice(0, 10)}.xlsx`);
     announce("Archivo Excel descargado.");
 });
 
